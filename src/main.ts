@@ -1,7 +1,6 @@
 import './assets/main.css'
-import VCalendar from 'v-calendar';
-import 'v-calendar/style.css';
-
+import VCalendar from 'v-calendar'
+import 'v-calendar/style.css'
 
 import { createApp } from 'vue'
 import App from './components/App.vue'

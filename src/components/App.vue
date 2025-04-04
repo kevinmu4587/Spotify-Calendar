@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import PodcastSearch from './PodcastSearch.vue';
-
+import PodcastSearch from './PodcastSearch.vue'
 </script>
 
 <template>

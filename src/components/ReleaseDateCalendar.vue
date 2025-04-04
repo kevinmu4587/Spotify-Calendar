@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { SpotifyShow } from '@/api/spotify_interface'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import type { CalendarEvent, SpotifyShow } from '@/api/spotify_interface'
+import { ref, computed, onMounted } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar'
 
 const props = defineProps<{
-  selectedPodcasts: Record<string, SpotifyShow>,
-  colours: string[],
+  selectedPodcasts: Record<string, SpotifyShow>
+  colours: string[]
 }>()
 
 const viewMode = ref<'month' | 'week'>('month')
@@ -13,9 +13,9 @@ const displayValue = ref<string>(new Date().toISOString().slice(0, 10))
 
 // Generate calendar events from podcast episodes
 const events = computed(() => {
-  const allEvents: any[] = []
+  const allEvents: CalendarEvent[] = []
 
-  Object.entries(props.selectedPodcasts).forEach(([_, podcast], i) => {
+  Object.entries(props.selectedPodcasts).forEach(([, /* unused */ podcast], i) => {
     const color = props.colours[i]
     const episodes = podcast.latest_episodes || []
 
@@ -33,8 +33,7 @@ const events = computed(() => {
   return allEvents
 })
 
-
-function moveDate(offset: number) {
+const moveDate = (offset: number): void => {
   const current = new Date(displayValue.value)
   if (viewMode.value === 'month') {
     current.setMonth(current.getMonth() + offset)
@@ -44,7 +43,7 @@ function moveDate(offset: number) {
   displayValue.value = current.toISOString().slice(0, 10)
 }
 
-function handleKeydown(e: KeyboardEvent) {
+const handleKeydown = (e: KeyboardEvent): void => {
   if (e.key === 'ArrowLeft') {
     e.preventDefault()
     moveDate(-1)
@@ -65,34 +64,30 @@ function handleKeydown(e: KeyboardEvent) {
 onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
 })
-
-onBeforeUnmount(() => {
-  window.removeEventListener('keydown', handleKeydown)
-})
 </script>
 
 <template>
   <div>
     <v-row justify="space-between" class="mb-4">
       <v-col cols="auto">
-        <v-btn-toggle
-          v-model="viewMode"
-          divided
-          mandatory
-        >
-          <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="week">Week View (w)</v-btn>
-          <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="month">Month View (m)</v-btn>
+        <v-btn-toggle v-model="viewMode" divided mandatory>
+          <v-btn style="background-color: var(--vt-c-accent-dark-1)" value="week"
+            >Week View (w)</v-btn
+          >
+          <v-btn style="background-color: var(--vt-c-accent-dark-1)" value="month"
+            >Month View (m)</v-btn
+          >
         </v-btn-toggle>
       </v-col>
 
       <v-col cols="auto" class="d-flex">
-        <v-btn color="black"  @click="moveDate(-1)">< Previous</v-btn>
+        <v-btn color="black" @click="moveDate(-1)">&lt; Previous</v-btn>
 
         <h2 class="text-xl font-bold mx-4">
           {{ new Date(displayValue).toLocaleDateString('en', { month: 'long', year: 'numeric' }) }}
         </h2>
 
-        <v-btn color="black" @click="moveDate(1)">Next ></v-btn>
+        <v-btn color="black" @click="moveDate(1)">Next &gt;</v-btn>
       </v-col>
     </v-row>
 

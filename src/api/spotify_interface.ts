@@ -21,6 +21,7 @@ export interface SpotifyShow {
 }
 
 export interface SpotifyShowEpisode {
+  id: string
   name: string
   images: SpotifyImage[]
   description: string
@@ -30,4 +31,12 @@ export interface SpotifyShowEpisode {
 
 export interface SpotifyShowEpisodes {
   items: SpotifyShowEpisode[]
+}
+
+export interface CalendarEvent {
+  title: string
+  start: Date
+  end: Date
+  color: string
+  timed: boolean
 }

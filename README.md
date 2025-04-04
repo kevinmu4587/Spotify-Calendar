@@ -1,6 +1,15 @@
-# vue-crash-course
+# Spotify Podcast Search
+A frontend website written in Vue 3 using the composition API to allow users to search for real Spotify podcasts, select them, and view the latest episodes in a calendar format.
 
-This template should help get you started developing with Vue 3 in Vite.
+## API Setup
+Spotify API requires a bearer token to work. To get the token, run this command:
+```
+curl -X POST "https://accounts.spotify.com/api/token" \
+     -H "Content-Type: application/x-www-form-urlencoded" \
+     -d "grant_type=client_credentials&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>"
+```
+Client ID and client secret can be obtained from the Spotify app manager. Do not share the bearer token anywhere!
+
 
 ## Recommended IDE Setup
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {ref, watch} from 'vue';
+import { ref, watch } from 'vue'
 const text = ref<string>('')
-let isError = ref<boolean>(false)
+const isError = ref<boolean>(false)
 
 const inputRef = ref()
 
@@ -11,10 +11,10 @@ const props = defineProps<{
 
 const onSubmit = () => {
   if (text.value === '') {
-    isError.value = true;
-    return;
+    isError.value = true
+    return
   }
-  isError.value = false;
+  isError.value = false
   props.onClickSearch(text.value)
 }
 
@@ -31,13 +31,13 @@ watch(text, (val) => {
   }
 })
 
-function focusInput() {
+const focusInput = (): void => {
   console.log('SearchBar.vue: Focusing to search bar')
   inputRef.value.focus()
   isError.value = false
 }
 
-function unfocusInput() {
+const unfocusInput = (): void => {
   inputRef.value.$el.querySelector('input').blur()
 }
 
@@ -61,15 +61,9 @@ defineExpose({ focusInput, unfocusInput })
     </v-col>
 
     <v-col cols="1">
-      <v-btn 
-        style="background-color: var(--vt-c-accent-dark-1);"
-        height="40"
-        @click="onSubmit"
-      >
+      <v-btn style="background-color: var(--vt-c-accent-dark-1)" height="40" @click="onSubmit">
         Search
       </v-btn>
     </v-col>
   </v-row>
 </template>
-
-
