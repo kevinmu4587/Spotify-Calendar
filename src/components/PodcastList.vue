@@ -5,9 +5,10 @@ import PodcastModal from './PodcastModal.vue';
 
 const props = defineProps<{
   podcasts: SpotifyShow[],
-  selectedPodcasts: Record<string, SpotifyShow>,
+  selectedPodcasts?: Record<string, SpotifyShow>,
   colours: string[],
-  onSelectPodcast: (selectedPodcasts: Record<string, SpotifyShow>) => {}
+  onSelectPodcast?: (selectedPodcasts: Record<string, SpotifyShow>) => {},
+  readonly: boolean
 }>()
 
 const isShowModal = ref<boolean>(false)
@@ -26,7 +27,7 @@ const toggleSelect = (id: string) => {
       selected[id] = podcast
     }
   }
-  props.onSelectPodcast(selected)
+  if (props.onSelectPodcast) props.onSelectPodcast(selected)
   console.log('selected podcasts is now', selected)
 }
 
@@ -98,7 +99,7 @@ watch(hoveredIndex, (newIndex) => {
 });
 
 function getBackgroundColor(id: string, index: number) {
-  if (id in props.selectedPodcasts) {
+  if (props.selectedPodcasts && id in props.selectedPodcasts) {
     const selectedIds = Object.keys(props.selectedPodcasts)
     const selectedIndex = selectedIds.indexOf(id)
     return props.colours[selectedIndex]
@@ -154,13 +155,31 @@ function getBackgroundColor(id: string, index: number) {
             {{ podcast.description }}
           </div>
         </v-col>
+      </v-row>
+      <v-row 
+        class="ml-4 pa-1 flex-nowrap"
+        v-if="readonly"
+        v-for="episode in podcast?.latest_episodes"
+        :style="{
+          backgroundColor: getBackgroundColor(podcast.id, index)
+        }"
+        no-gutters
+      >
+        <v-col>
+          <p class="pl-10" style="color: white">
+            {{  episode.name }}
+          </p>
+          <p class="pl-10" style="color: white">
+            {{  episode.release_date }}
+          </p>
+        </v-col>
         <v-col cols="auto" class="ml-auto d-flex align-center">
           <v-btn
             style="background-color: var(--vt-c-accent-dark-1);"
             height="40"
              @click.stop="onClickDetails(podcast)"
           >
-            Details (d)
+            Details
           </v-btn>
         </v-col>
       </v-row>

@@ -16,7 +16,7 @@ const podcastListRef = ref<InstanceType<typeof PodcastList> | null>(null)
   const colours: string[] = [
   '#00796B',
   '#303F9F',
-  '#EF6C00',
+  '#CF4C00',
   '#6A1B9A',
   '#C62828',
 ]
@@ -102,15 +102,23 @@ onMounted(() => {
       :selectedPodcasts="selectedPodcasts"
       :colours="colours" 
       :onSelectPodcast="fetchReleaseDates"
+      :readonly="false"
       ref="podcastListRef"
     />
-    <p class="pa-4">Podcast's latest episode release dates (hover to view podcast name):</p>
+    <p class="pa-4">Podcast's latest episode release dates:</p>
     <div class="pb-10 px-4">
       <ReleaseDateCalendar 
         :colours="colours" 
         :selectedPodcasts="selectedPodcasts"
       />
     </div>
+    <p class="pa-4">More information about the latest episodes:</p>
+    <PodcastList
+      :podcasts="Object.values(selectedPodcasts)"
+      :selectedPodcasts="selectedPodcasts"
+      :colours="colours" 
+      :readonly="true"
+    />
 </template>
 
 <style scoped>
