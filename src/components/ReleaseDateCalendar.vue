@@ -8,8 +8,8 @@ const props = defineProps<{
   colours: string[],
 }>()
 
-const focusedDate = ref<string>(new Date().toISOString().slice(0, 10))
 const viewMode = ref<'month' | 'week'>('month')
+const displayValue = ref<string>(new Date().toISOString().slice(0, 10))
 
 // Generate calendar events from podcast episodes
 const events = computed(() => {
@@ -38,7 +38,7 @@ function onEventClick({ event }: { event: any }) {
 }
 
 function moveDate(offset: number) {
-  const current = new Date(focusedDate.value)
+  const current = new Date(displayValue.value)
 
   if (viewMode.value === 'month') {
     current.setMonth(current.getMonth() + offset)
@@ -46,13 +46,14 @@ function moveDate(offset: number) {
     current.setDate(current.getDate() + offset * 7)
   }
 
-  focusedDate.value = current.toISOString().slice(0, 10)
+  displayValue.value = current.toISOString().slice(0, 10)
 }
 
 function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowLeft') {
     e.preventDefault()
     moveDate(-1)
+    console.log('value: ', value.value)
   } else if (e.key === 'ArrowRight') {
     e.preventDefault()
     moveDate(1)
@@ -82,7 +83,7 @@ onBeforeUnmount(() => {
 
     <v-calendar
       ref="calendar"
-      v-model:focused="focusedDate"
+      :display-value="displayValue"
       :events="events"
       :view-mode="viewMode"
       :hide-week-number="true"
