@@ -22,7 +22,10 @@ export interface SpotifyShow {
 
 export interface SpotifyShowEpisode {
   name: string
+  images: SpotifyImage[]
+  description: string
   release_date: string
+  external_urls: SpotifyShowExternalUrl
 }
 
 export interface SpotifyShowEpisodes {

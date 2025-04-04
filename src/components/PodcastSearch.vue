@@ -48,10 +48,7 @@ const fetchReleaseDates = async (updatedSelectedPodcasts: Record<string, Spotify
     const releaseMap: Record<string, SpotifyShow> = {}
     result.forEach(({id, episodes}) => {
       const latestEpisodes = episodes.map((episode) => {
-        return {
-          release_date: episode.release_date,
-          name: episode.name,
-        }
+        return episode as SpotifyShowEpisode
       })
       releaseMap[id] = {
         ...selectedPodcasts.value[id],
@@ -102,7 +99,7 @@ onMounted(() => {
       :selectedPodcasts="selectedPodcasts"
       :colours="colours" 
       :onSelectPodcast="fetchReleaseDates"
-      :readonly="false"
+      :expanded="false"
       ref="podcastListRef"
     />
     <p class="pa-4">Podcast's latest episode release dates:</p>
@@ -117,7 +114,7 @@ onMounted(() => {
       :podcasts="Object.values(selectedPodcasts)"
       :selectedPodcasts="selectedPodcasts"
       :colours="colours" 
-      :readonly="true"
+      :expanded="true"
     />
 </template>
 

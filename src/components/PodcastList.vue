@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SpotifyShow } from '@/api/spotify_interface';
+import type { SpotifyShow, SpotifyShowEpisode } from '@/api/spotify_interface';
 import { onMounted, ref, watch } from 'vue';
 import PodcastModal from './PodcastModal.vue';
 
@@ -8,11 +8,11 @@ const props = defineProps<{
   selectedPodcasts?: Record<string, SpotifyShow>,
   colours: string[],
   onSelectPodcast?: (selectedPodcasts: Record<string, SpotifyShow>) => {},
-  readonly: boolean
+  expanded: boolean
 }>()
 
 const isShowModal = ref<boolean>(false)
-const modalPodcast = ref<SpotifyShow | null>(null)
+const modalPodcastEpisode = ref<SpotifyShowEpisode | null>(null)
 const hoveredIndex = ref<number>(-1)
 const rowRefs = ref<{ $el: HTMLElement }[]>([]);
 
@@ -31,13 +31,14 @@ const toggleSelect = (id: string) => {
   console.log('selected podcasts is now', selected)
 }
 
-const onClickDetails = (podcast: SpotifyShow): void => {
-  modalPodcast.value = podcast
+const onClickDetails = (episode: SpotifyShowEpisode): void => {
+  console.log('opening modals', episode)
+  modalPodcastEpisode.value = episode
   isShowModal.value = true
 }
 
 const onCloseModal = (): void => {
-  modalPodcast.value = null
+  modalPodcastEpisode.value = null
   isShowModal.value = false
 }
 
@@ -51,7 +52,7 @@ onMounted(() => {
       }
     } else if (e.key === 'd') {
       isShowModal.value = true;
-      modalPodcast.value = props.podcasts[hoveredIndex.value]
+      // modalPodcastEpisode.value = props.podcasts[hoveredIndex.value]
     } else if (e.key == 'Escape') {
       onCloseModal()
     }
@@ -113,7 +114,7 @@ function getBackgroundColor(id: string, index: number) {
 </script>
 
 <template>
-  <PodcastModal :isShowModal="isShowModal" :podcast="modalPodcast" :onClose="onCloseModal"/>
+  <PodcastModal :isShowModal="isShowModal" :episode="modalPodcastEpisode" :onClose="onCloseModal"/>
   <v-card class="pa-4 mx-4 podcastList" max-height="800"
   >
     <div v-if="podcasts.length == 0">
@@ -158,7 +159,7 @@ function getBackgroundColor(id: string, index: number) {
       </v-row>
       <v-row 
         class="ml-4 pa-1 flex-nowrap"
-        v-if="readonly"
+        v-if="expanded"
         v-for="episode in podcast?.latest_episodes"
         :style="{
           backgroundColor: getBackgroundColor(podcast.id, index)
@@ -177,7 +178,8 @@ function getBackgroundColor(id: string, index: number) {
           <v-btn
             style="background-color: var(--vt-c-accent-dark-1);"
             height="40"
-             @click.stop="onClickDetails(podcast)"
+             @click="onClickDetails(episode)"
+             @keydown.enter="onClickDetails(episode)"
           >
             Details
           </v-btn>

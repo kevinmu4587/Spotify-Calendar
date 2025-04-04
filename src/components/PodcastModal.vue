@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import type { SpotifyShow } from '@/api/spotify_interface'
-import SearchBar from './SearchBar.vue';
-import { ref } from 'vue';
+import type { SpotifyShowEpisode } from '@/api/spotify_interface'
 
 const props = defineProps<{
-  podcast: SpotifyShow | null,
+  episode: SpotifyShowEpisode | null,
   onClose: () => void,
   isShowModal: boolean,
 }>()
@@ -18,21 +16,20 @@ const props = defineProps<{
   >
     <v-card>
       <v-card-title class="text-h6">
-        {{ props.podcast?.name }}
+        {{ props.episode?.name }}
       </v-card-title>
 
-      <v-card-text>
-        <p><strong>Publisher:</strong> {{ props.podcast?.publisher }}</p>
-        <p><strong>Description:</strong> {{ props.podcast?.description }}</p>
-        <p><strong>Number of episodes:</strong> {{ props.podcast?.total_episodes }}</p>
+      <v-card-text style="white-space: normal;">
+          <p>
+            <strong>Description:</strong> {{ props.episode?.description }}
+          </p>
         <strong>Url: </strong> 
-          <a :href="props.podcast?.external_urls.spotify" target="_blank">
-            {{ props.podcast?.external_urls.spotify }}
+          <a :href="props.episode?.external_urls.spotify" target="_blank">
+            {{ props.episode?.external_urls.spotify }}
           </a>
-
         <v-img
-          v-if="props.podcast?.images?.[0]"
-          :src="props.podcast?.images[0].url"
+          v-if="props.episode?.images?.[0]"
+          :src="props.episode?.images[0].url"
           width="100%"
           class="mt-4 rounded"
           cover
