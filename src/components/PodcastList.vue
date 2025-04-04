@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { SpotifyShow } from '@/api/spotify_interface';
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import PodcastModal from './PodcastModal.vue';
 
 const props = defineProps<{
@@ -12,6 +12,8 @@ const props = defineProps<{
 
 const isShowModal = ref<boolean>(false)
 const modalPodcast = ref<SpotifyShow | null>(null)
+const hoveredIndex = ref<number>(-1)
+const rowRefs = ref<{ $el: HTMLElement }[]>([]);
 
 const toggleSelect = (id: string) => {
   const selected = { ...props.selectedPodcasts }
@@ -25,13 +27,7 @@ const toggleSelect = (id: string) => {
     }
   }
   props.onSelectPodcast(selected)
-  console.log()
-}
-
-const getSelectedColour = (id: string): string => {
-  const selectedIds = Object.keys(props.selectedPodcasts)
-  const selectedIndex = selectedIds.indexOf(id)
-  return props.colours[selectedIndex]
+  console.log('selected podcasts is now', selected)
 }
 
 const onClickDetails = (podcast: SpotifyShow): void => {
@@ -43,23 +39,95 @@ const onCloseModal = (): void => {
   modalPodcast.value = null
   isShowModal.value = false
 }
+
+onMounted(() => {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      if (hoveredIndex.value !== -1 && props.podcasts.length !== 0) {
+        console.log('keyboard selected id: ', props.podcasts[hoveredIndex.value].id)
+        toggleSelect(props.podcasts[hoveredIndex.value].id)
+      }
+    } else if (e.key === 'd') {
+      isShowModal.value = true;
+      modalPodcast.value = props.podcasts[hoveredIndex.value]
+    } else if (e.key == 'Escape') {
+      onCloseModal()
+    }
+  })
+})
+
+
+function scrollHoverUp(): void {
+  console.log('hover index up')
+  if (props.podcasts.length === 0) return 
+  if (hoveredIndex.value === -1) {
+    hoveredIndex.value = 0
+    return
+  }
+  hoveredIndex.value = 
+    hoveredIndex.value - 1 < 0 
+      ? props.podcasts.length - 1 
+      : hoveredIndex.value - 1
+  }
+
+function scrollHoverDown(): void {
+  console.log('hover index down')
+  if (props.podcasts.length == 0) return
+  if (hoveredIndex.value === -1) {
+    hoveredIndex.value = 0
+    return
+  }
+
+  hoveredIndex.value = 
+    hoveredIndex.value + 1 >= props.podcasts.length 
+      ? 0 
+      : hoveredIndex.value + 1
+  }
+
+defineExpose({ scrollHoverUp, scrollHoverDown })
+
+watch(hoveredIndex, (newIndex) => {
+  const row = rowRefs.value[newIndex];
+  if (row && row.$el) {
+    row.$el.scrollIntoView({
+      behavior: 'smooth',
+      block: 'nearest',
+    });
+  }
+});
+
+function getBackgroundColor(id: string, index: number) {
+  if (id in props.selectedPodcasts) {
+    const selectedIds = Object.keys(props.selectedPodcasts)
+    const selectedIndex = selectedIds.indexOf(id)
+    return props.colours[selectedIndex]
+  } else if (index === hoveredIndex.value) {
+    // same colour as hovering with a mouse
+    return getComputedStyle(document.documentElement)
+    .getPropertyValue('--color-accent-2')
+    .trim()
+  }
+}
 </script>
 
 <template>
   <PodcastModal :isShowModal="isShowModal" :podcast="modalPodcast" :onClose="onCloseModal"/>
-  <v-card class="pa-4 podcastList" max-height="800">
+  <v-card class="pa-4 mx-4 podcastList" max-height="800"
+  >
     <div v-if="podcasts.length == 0">
       <p class="description" style="text-align: center;">No podcasts. Enter a search query.</p>
     </div>
-    <div v-else v-for="podcast in podcasts" :key="podcast.id">
+    <div v-else v-for="(podcast, index) in podcasts" :key="podcast.id">
       <v-row
         class="my-3 pa-4 flex-nowrap clickable"
         style="min-height: 100px; cursor: pointer;"
         :style="{
-          backgroundColor: podcast.id in selectedPodcasts
-            ? getSelectedColour(podcast.id)
-            : undefined
+          backgroundColor: getBackgroundColor(podcast.id, index)
         }"
+        ref="rowRefs"
+        :ref_for="true"
+        :ref_key="`${index}`"
         no-gutters
         @click="toggleSelect(podcast.id)"
       >

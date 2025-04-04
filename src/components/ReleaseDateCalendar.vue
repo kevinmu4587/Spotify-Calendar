@@ -1,45 +1,92 @@
 <script setup lang="ts">
-import type { SpotifyShow } from '@/api/spotify_interface';
-import { ref, computed } from 'vue'
+import type { SpotifyShow } from '@/api/spotify_interface'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { VCalendar } from 'vuetify/labs/VCalendar'
 
 const props = defineProps<{
   selectedPodcasts: Record<string, SpotifyShow>,
   colours: string[],
 }>()
 
-// convert releaseDates + colours into VCalendar attributes
-const attrs = computed(() => {
-  if (Object.keys(props.selectedPodcasts).length === 0) return []
+const focusedDate = ref<string>(new Date().toISOString().slice(0, 10))
+const viewMode = ref<'month' | 'week'>('month')
 
-  return Object.entries(props.selectedPodcasts).map(([_, podcast], index) => ({
-    key: `release-${index}`,
-    dates: podcast?.latest_episode?.release_date,
-    highlight: {
-      style: {
-        backgroundColor: props.colours[index],
-      }
-    },
-    popover: {
-      label: `${podcast?.name}: ${podcast?.latest_episode?.name}`,
-      color: props.colours[index]
-    },
-  }))
+// Generate calendar events from podcast episodes
+const events = computed(() => {
+  const allEvents: any[] = []
+
+  Object.entries(props.selectedPodcasts).forEach(([_, podcast], i) => {
+    const color = props.colours[i]
+    const episodes = podcast.latest_episodes || []
+
+    episodes.forEach((ep) => {
+      allEvents.push({
+        title: `${podcast.name}: ${ep.name}`,
+        start: new Date(ep.release_date),
+        end: new Date(ep.release_date),
+        color,
+        timed: false,
+      })
+    })
+  })
+
+  return allEvents
+})
+
+function onEventClick({ event }: { event: any }) {
+  console.log('Clicked event:', event)
+}
+
+function moveDate(offset: number) {
+  const current = new Date(focusedDate.value)
+
+  if (viewMode.value === 'month') {
+    current.setMonth(current.getMonth() + offset)
+  } else if (viewMode.value === 'week') {
+    current.setDate(current.getDate() + offset * 7)
+  }
+
+  focusedDate.value = current.toISOString().slice(0, 10)
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'ArrowLeft') {
+    e.preventDefault()
+    moveDate(-1)
+  } else if (e.key === 'ArrowRight') {
+    e.preventDefault()
+    moveDate(1)
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeydown)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown)
 })
 </script>
 
 <template>
-  <div class="calendar-scale mb-10" style="max-width: 800px; margin: auto;">
-    <VCalendar
-      :attributes="attrs"
-      title-position="center"
-      expanded
+  <div>
+    <v-btn-toggle
+      v-model="viewMode"
+      class="mr-4 my-4"
+      divided
+      mandatory
+    >
+      <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="week">Week View</v-btn>
+      <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="month">Month View</v-btn>
+    </v-btn-toggle>
+
+    <v-calendar
+      ref="calendar"
+      v-model:focused="focusedDate"
+      :events="events"
+      :view-mode="viewMode"
+      :hide-week-number="true"
+      @click:event="onEventClick"
     />
   </div>
 </template>
-
-<style scoped>
-.calendar-scale {
-  transform: scale(1.2);
-  transform-origin: top center;
-}
-</style>

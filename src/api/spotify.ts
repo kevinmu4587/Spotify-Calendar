@@ -42,8 +42,8 @@ export async function searchPodcasts(query: string): Promise<SpotifyShow[]> {
 * @param showId the id of the show
 * @returns (string) the release date
 */
-export async function getLatestEpisode(showId: string): Promise<SpotifyShowEpisode> {
-  const res = await fetch(`${SPOTIFY_API_BASE_URL}/shows/${showId}/episodes?market=US&limit=1`, {
+export async function getLatestEpisodes(showId: string, numEpisodes: number): Promise<SpotifyShowEpisode[]> {
+  const res = await fetch(`${SPOTIFY_API_BASE_URL}/shows/${showId}/episodes?market=US&limit=${numEpisodes}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
       'Content-Type': 'application/json',
@@ -56,9 +56,9 @@ export async function getLatestEpisode(showId: string): Promise<SpotifyShowEpiso
   }
 
   const data: SpotifyShowEpisodes = await res.json()
-  console.log('Release date result is: ', data.items?.[0])
+  console.log('Release date result is: ', data.items)
 
-  const latestEpisode: SpotifyShowEpisode = data.items?.[0]
-  return latestEpisode?? null
+  const latestEpisodes: SpotifyShowEpisode[] = data.items
+  return latestEpisodes.filter((show) => show != null)
 }
 

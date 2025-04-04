@@ -15,7 +15,7 @@ export interface SpotifyShow {
   name: string
   publisher: string
   total_episodes: number
-  latest_episode: SpotifyShowEpisode
+  latest_episodes: SpotifyShowEpisode[]
   uri: string
   external_urls: SpotifyShowExternalUrl
 }
