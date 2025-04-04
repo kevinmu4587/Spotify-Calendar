@@ -1,6 +1,6 @@
 <template>
   <header class="header-bar">
-    <h1 class="site-title">Search for Podcasts</h1>
+    <h1 class="site-title">Spotify Podcast Search</h1>
   </header>
 </template>
 
