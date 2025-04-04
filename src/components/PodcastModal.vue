@@ -41,7 +41,7 @@ const props = defineProps<{
 
       <v-card-actions>
         <v-spacer />
-        <v-btn color="primary" @click="props.onClose">Close</v-btn>
+        <v-btn color="primary" @click="props.onClose">Close (Escape)</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

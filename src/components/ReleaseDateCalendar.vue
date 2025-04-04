@@ -33,19 +33,14 @@ const events = computed(() => {
   return allEvents
 })
 
-function onEventClick({ event }: { event: any }) {
-  console.log('Clicked event:', event)
-}
 
 function moveDate(offset: number) {
   const current = new Date(displayValue.value)
-
   if (viewMode.value === 'month') {
     current.setMonth(current.getMonth() + offset)
   } else if (viewMode.value === 'week') {
     current.setDate(current.getDate() + offset * 7)
   }
-
   displayValue.value = current.toISOString().slice(0, 10)
 }
 
@@ -53,10 +48,17 @@ function handleKeydown(e: KeyboardEvent) {
   if (e.key === 'ArrowLeft') {
     e.preventDefault()
     moveDate(-1)
-    console.log('value: ', value.value)
+    console.log('left')
   } else if (e.key === 'ArrowRight') {
     e.preventDefault()
     moveDate(1)
+    console.log('right')
+  } else if (e.key === 'w') {
+    e.preventDefault()
+    viewMode.value = 'week'
+  } else if (e.key === 'm') {
+    e.preventDefault()
+    viewMode.value = 'month'
   }
 }
 
@@ -71,23 +73,35 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
-    <v-btn-toggle
-      v-model="viewMode"
-      class="mr-4 my-4"
-      divided
-      mandatory
-    >
-      <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="week">Week View</v-btn>
-      <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="month">Month View</v-btn>
-    </v-btn-toggle>
+    <v-row justify="space-between" class="mb-4">
+      <v-col cols="auto">
+        <v-btn-toggle
+          v-model="viewMode"
+          divided
+          mandatory
+        >
+          <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="week">Week View (w)</v-btn>
+          <v-btn style="background-color: var(--vt-c-accent-dark-1);" value="month">Month View (m)</v-btn>
+        </v-btn-toggle>
+      </v-col>
+
+      <v-col cols="auto" class="d-flex">
+        <v-btn color="black"  @click="moveDate(-1)">< Previous</v-btn>
+
+        <h2 class="text-xl font-bold mx-4">
+          {{ new Date(displayValue).toLocaleDateString('en', { month: 'long', year: 'numeric' }) }}
+        </h2>
+
+        <v-btn color="black" @click="moveDate(1)">Next ></v-btn>
+      </v-col>
+    </v-row>
 
     <v-calendar
-      ref="calendar"
+      hide-header
       :display-value="displayValue"
       :events="events"
       :view-mode="viewMode"
       :hide-week-number="true"
-      @click:event="onEventClick"
     />
   </div>
 </template>

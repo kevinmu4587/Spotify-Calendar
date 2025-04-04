@@ -160,7 +160,7 @@ function getBackgroundColor(id: string, index: number) {
             height="40"
              @click.stop="onClickDetails(podcast)"
           >
-            Details
+            Details (d)
           </v-btn>
         </v-col>
       </v-row>
