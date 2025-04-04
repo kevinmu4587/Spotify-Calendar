@@ -8,7 +8,13 @@ curl -X POST "https://accounts.spotify.com/api/token" \
      -H "Content-Type: application/x-www-form-urlencoded" \
      -d "grant_type=client_credentials&client_id=<CLIENT_ID>&client_secret=<CLIENT_SECRET>"
 ```
-Client ID and client secret can be obtained from the Spotify app manager. Do not share the bearer token anywhere!
+Client ID and client secret can be obtained from the Spotify app manager.
+The bearer token should go inside a file called `.env` with the following format.
+```
+VITE_SPOTIFY_TOKEN=<Bearer token>
+```
+ **Do not share or commit the bearer token anywhere!**
+
 
 
 ## Recommended IDE Setup
