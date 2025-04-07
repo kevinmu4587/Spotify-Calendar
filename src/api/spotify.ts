@@ -12,7 +12,6 @@ const accessToken = import.meta.env.VITE_SPOTIFY_TOKEN
  * @returns
  */
 export async function searchPodcasts(query: string): Promise<SpotifyShow[]> {
-  console.log(accessToken)
   const params = new URLSearchParams({
     q: query,
     type: 'show',

@@ -21,7 +21,8 @@ const events = computed(() => {
 
     episodes.forEach((ep) => {
       allEvents.push({
-        title: `${podcast.name}: ${ep.name}`,
+        title: `${ep.name}`,
+        fullTitle: `${podcast.name} | ${ep.name}`,
         start: new Date(ep.release_date),
         end: new Date(ep.release_date),
         color,
@@ -101,6 +102,31 @@ onMounted(() => {
       :events="events"
       :view-mode="viewMode"
       :hide-week-number="true"
-    />
+    >
+      <template #event="{ event }">
+        <v-tooltip location="bottom">
+          <template #activator="{ props }">
+            <div
+              v-bind="props"
+              class="ma-1 px-2 py-1 rounded calendar-episode"
+              :style="{ backgroundColor: event.color as string, color: 'white', cursor: 'pointer' }"
+            >
+              {{ event.title }}
+            </div>
+          </template>
+        <span>{{ event.fullTitle }}</span>
+        </v-tooltip>
+      </template>
+    </v-calendar>
   </div>
 </template>
+
+<style scoped>
+.calendar-episode {
+  color: white;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+</style>

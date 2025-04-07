@@ -15,13 +15,18 @@ const isShowModal = ref<boolean>(false)
 const modalPodcastEpisode = ref<SpotifyShowEpisode | null>(null)
 const hoveredIndex = ref<number>(-1)
 const rowRefs = ref<{ $el: HTMLElement }[]>([])
+const showErrorToast = ref<boolean>(false)
+const toastMessage = ref<string>('')
 
 const toggleSelect = (id: string): void => {
   const selected = { ...props.selectedPodcasts }
 
   if (id in selected) {
     delete selected[id]
-  } else if (Object.keys(selected).length < 5) {
+  } else if (Object.keys(selected).length >= 5) {
+    showErrorToast.value = true;
+    toastMessage.value = "Cannot select more than 5 podcasts!"
+  } else {
     const podcast = props.podcasts.find((p) => p.id === id)
     if (podcast) {
       selected[id] = podcast
@@ -104,6 +109,9 @@ const getBackgroundColor = (id: string, index: number): string => {
 </script>
 
 <template>
+  <v-snackbar v-model="showErrorToast" color="warning" timeout="3000" location="top">
+    {{ toastMessage }}
+  </v-snackbar>
   <PodcastModal :isShowModal="isShowModal" :episode="modalPodcastEpisode" :onClose="onCloseModal" />
   <v-card class="pa-4 mx-4 podcastList" max-height="800">
     <div v-if="podcasts.length == 0">

@@ -35,6 +35,7 @@ export interface SpotifyShowEpisodes {
 
 export interface CalendarEvent {
   title: string
+  fullTitle: string
   start: Date
   end: Date
   color: string
