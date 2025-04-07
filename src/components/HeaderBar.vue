@@ -12,7 +12,6 @@
 }
 
 .site-title {
-  margin: 0;
   font-size: 1.5rem;
   color: var(--vt-c-black);
 }

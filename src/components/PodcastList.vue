@@ -107,7 +107,7 @@ const getBackgroundColor = (id: string, index: number): string => {
   <PodcastModal :isShowModal="isShowModal" :episode="modalPodcastEpisode" :onClose="onCloseModal" />
   <v-card class="pa-4 mx-4 podcastList" max-height="800">
     <div v-if="podcasts.length == 0">
-      <p class="description" style="text-align: center">No podcasts. Enter a search query.</p>
+      <p class="description" style="text-align: center;">No podcasts. Enter a search query.</p>
     </div>
     <div v-else v-for="(podcast, index) in podcasts" :key="podcast.id">
       <v-row
@@ -126,7 +126,7 @@ const getBackgroundColor = (id: string, index: number): string => {
           <v-img :src="podcast.images[0]?.url" width="56" cover height="56" class="rounded" />
         </v-col>
 
-        <v-col cols="10" class="px-4 pr-12">
+        <v-col cols="auto" class="pl-4 pr-12">
           <div class="text-subtitle-1 title">
             {{ podcast.name }}
           </div>
@@ -140,7 +140,7 @@ const getBackgroundColor = (id: string, index: number): string => {
       </v-row>
       <template v-if="expanded">
         <v-row
-          class="ml-4 pa-1 flex-nowrap"
+          class="py-2 px-4 flex-nowrap"
           v-for="episode in podcast?.latest_episodes"
           :key="episode.id"
           :style="{
@@ -152,11 +152,11 @@ const getBackgroundColor = (id: string, index: number): string => {
             <p class="pl-10" style="color: white">
               {{ episode.name }}
             </p>
-            <p class="pl-10" style="color: white">
+            <p class="pl-10 description">
               {{ episode.release_date }}
             </p>
           </v-col>
-          <v-col cols="auto" class="ml-auto d-flex align-center">
+          <v-col cols="auto" class="ml-auto">
             <v-btn
               style="background-color: var(--vt-c-accent-dark-1)"
               height="40"
@@ -183,7 +183,7 @@ const getBackgroundColor = (id: string, index: number): string => {
 }
 
 .title {
-  color: var(--color-text);
+  color: white;
   font-weight: bold;
 }
 

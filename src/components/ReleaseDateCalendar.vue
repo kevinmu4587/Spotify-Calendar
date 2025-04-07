@@ -44,6 +44,10 @@ const moveDate = (offset: number): void => {
 }
 
 const handleKeydown = (e: KeyboardEvent): void => {
+  const target = e.target as HTMLElement
+  const isTyping = ['INPUT', 'TEXTAREA'].includes(target.tagName) || target.getAttribute('contenteditable') === 'true'
+
+  if (isTyping) return
   if (e.key === 'ArrowLeft') {
     e.preventDefault()
     moveDate(-1)
@@ -68,8 +72,8 @@ onMounted(() => {
 
 <template>
   <div>
-    <v-row justify="space-between" class="mb-4">
-      <v-col cols="auto">
+    <v-row class="mb-4 d-flex">
+      <v-col cols="4" class="d-flex justify-start">
         <v-btn-toggle v-model="viewMode" divided mandatory>
           <v-btn style="background-color: var(--vt-c-accent-dark-1)" value="week"
             >Week View (w)</v-btn
@@ -80,7 +84,7 @@ onMounted(() => {
         </v-btn-toggle>
       </v-col>
 
-      <v-col cols="auto" class="d-flex">
+      <v-col cols="8" class="d-flex justify-end">
         <v-btn color="black" @click="moveDate(-1)">&lt; Previous</v-btn>
 
         <h2 class="text-xl font-bold mx-4">
