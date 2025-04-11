@@ -26,7 +26,7 @@ const handleKeyPress = (e: KeyboardEvent) => {
 }
 
 watch(text, (val) => {
-  if (val.trim() !== '') {
+  if (val?.trim() !== '') {
     isError.value = false
   }
 })
@@ -52,7 +52,7 @@ defineExpose({ focusInput, unfocusInput })
         :error-messages="isError ? 'Search term is required' : ''"
         clearable
         prepend-icon="mdi-magnify"
-        label="Search podcasts"
+        label="Search podcasts (/ to jump to search bar)"
         v-model="text"
         density="compact"
         @keyup="handleKeyPress"

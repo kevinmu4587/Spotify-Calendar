@@ -32,12 +32,10 @@ const toggleSelect = (id: string): void => {
       selected[id] = podcast
     }
   }
-  console.log('selected podcasts is now', selected)
   if (props.onSelectPodcast) props.onSelectPodcast(selected)
 }
 
 const scrollHoverUp = (): void => {
-  console.log('hover index up')
   if (props.podcasts.length === 0) return
   if (hoveredIndex.value === -1) {
     hoveredIndex.value = 0
@@ -48,7 +46,6 @@ const scrollHoverUp = (): void => {
 }
 
 const scrollHoverDown = (): void => {
-  console.log('hover index down')
   if (props.podcasts.length == 0) return
   if (hoveredIndex.value === -1) {
     hoveredIndex.value = 0
