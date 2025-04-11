@@ -24,16 +24,16 @@ const toggleSelect = (id: string): void => {
   if (id in selected) {
     delete selected[id]
   } else if (Object.keys(selected).length >= 5) {
-    showErrorToast.value = true;
-    toastMessage.value = "Cannot select more than 5 podcasts!"
+    showErrorToast.value = true
+    toastMessage.value = 'Cannot select more than 5 podcasts!'
   } else {
     const podcast = props.podcasts.find((p) => p.id === id)
     if (podcast) {
       selected[id] = podcast
     }
   }
-  if (props.onSelectPodcast) props.onSelectPodcast(selected)
   console.log('selected podcasts is now', selected)
+  if (props.onSelectPodcast) props.onSelectPodcast(selected)
 }
 
 const scrollHoverUp = (): void => {
@@ -59,7 +59,6 @@ const scrollHoverDown = (): void => {
 }
 
 const onClickDetails = (episode: SpotifyShowEpisode): void => {
-  console.log('opening modals', episode)
   modalPodcastEpisode.value = episode
   isShowModal.value = true
 }
@@ -74,7 +73,6 @@ onMounted(() => {
     if (e.key === 'Enter') {
       e.preventDefault()
       if (hoveredIndex.value !== -1 && props.podcasts.length !== 0) {
-        console.log('keyboard selected id: ', props.podcasts[hoveredIndex.value].id)
         toggleSelect(props.podcasts[hoveredIndex.value].id)
       }
     } else if (e.key == 'Escape') {
@@ -85,7 +83,7 @@ onMounted(() => {
 
 defineExpose({ scrollHoverUp, scrollHoverDown })
 
-watch(hoveredIndex, (newIndex) => {
+watch(hoveredIndex, async (newIndex) => {
   const row = rowRefs.value[newIndex]
   if (row && row.$el) {
     row.$el.scrollIntoView({
@@ -95,6 +93,12 @@ watch(hoveredIndex, (newIndex) => {
   }
 })
 
+watch(
+  () => props.podcasts,
+  () => {
+    rowRefs.value = []
+  },
+)
 const getBackgroundColor = (id: string, index: number): string => {
   if (props.selectedPodcasts && id in props.selectedPodcasts) {
     const selectedIds = Object.keys(props.selectedPodcasts)
@@ -109,13 +113,13 @@ const getBackgroundColor = (id: string, index: number): string => {
 </script>
 
 <template>
-  <v-snackbar v-model="showErrorToast" color="warning" timeout="3000" location="top">
+  <v-snackbar v-model="showErrorToast" color="warning" timeout="3000" location="bottom">
     {{ toastMessage }}
   </v-snackbar>
   <PodcastModal :isShowModal="isShowModal" :episode="modalPodcastEpisode" :onClose="onCloseModal" />
   <v-card class="pa-4 mx-4 podcastList" max-height="800">
     <div v-if="podcasts.length == 0">
-      <p class="description" style="text-align: center;">No podcasts. Enter a search query.</p>
+      <p class="description" style="text-align: center">No podcasts. Enter a search query.</p>
     </div>
     <div v-else v-for="(podcast, index) in podcasts" :key="podcast.id">
       <v-row
@@ -129,6 +133,7 @@ const getBackgroundColor = (id: string, index: number): string => {
         :ref_key="`${index}`"
         no-gutters
         @click="toggleSelect(podcast.id)"
+        @mouseenter="hoveredIndex = -1"
       >
         <v-col cols="auto">
           <v-img :src="podcast.images[0]?.url" width="56" cover height="56" class="rounded" />

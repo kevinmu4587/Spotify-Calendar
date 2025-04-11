@@ -46,7 +46,9 @@ const moveDate = (offset: number): void => {
 
 const handleKeydown = (e: KeyboardEvent): void => {
   const target = e.target as HTMLElement
-  const isTyping = ['INPUT', 'TEXTAREA'].includes(target.tagName) || target.getAttribute('contenteditable') === 'true'
+  const isTyping =
+    ['INPUT', 'TEXTAREA'].includes(target.tagName) ||
+    target.getAttribute('contenteditable') === 'true'
 
   if (isTyping) return
   if (e.key === 'ArrowLeft') {
@@ -114,7 +116,7 @@ onMounted(() => {
               {{ event.title }}
             </div>
           </template>
-        <span>{{ event.fullTitle }}</span>
+          <span>{{ event.fullTitle }}</span>
         </v-tooltip>
       </template>
     </v-calendar>

@@ -8,7 +8,8 @@ import type { SpotifyShow, SpotifyShowEpisode } from '@/api/spotify_interface'
 
 const podcasts = ref<SpotifyShow[]>([])
 const selectedPodcasts = ref<Record<string, SpotifyShow>>({})
-const showErrorToast = ref<boolean>(false)
+const showToast = ref<boolean>(false)
+const toastLevel = ref<'error' | 'success'>('error')
 const toastMessage = ref<string>('')
 // to access the child SearchBar's functions
 const searchBarRef = ref<InstanceType<typeof SearchBar> | null>(null)
@@ -17,11 +18,13 @@ const colours: string[] = ['#00796B', '#303F9F', '#CF4C00', '#6A1B9A', '#C62828'
 
 const fetchSpotifyPodcasts = async (query: string): Promise<void> => {
   try {
+    podcasts.value = []
     selectedPodcasts.value = {}
     podcasts.value = await searchPodcasts(query)
   } catch (error) {
     console.error('Could not make API request')
-    showErrorToast.value = true
+    showToast.value = true
+    toastLevel.value = 'error'
     if (error instanceof Error) {
       toastMessage.value = error.message
     }
@@ -32,27 +35,27 @@ const fetchReleaseDates = async (
   updatedSelectedPodcasts: Record<string, SpotifyShow>,
 ): Promise<void> => {
   try {
-    selectedPodcasts.value = updatedSelectedPodcasts
-    const selectedIds = Object.keys(selectedPodcasts.value)
-    const result = await Promise.all(
-      selectedIds.map(async (id) => {
-        const episodes: SpotifyShowEpisode[] = await getLatestEpisodes(id, 5)
-        return { id, episodes }
-      }),
-    )
+    const lenUpdated = Object.keys(updatedSelectedPodcasts).length
+    const lenPrev = Object.keys(selectedPodcasts.value).length
+    if (lenUpdated < lenPrev) {
+      // do nothing (deselected)
+      selectedPodcasts.value = updatedSelectedPodcasts
+      return
+    }
 
-    const releaseMap: Record<string, SpotifyShow> = {}
-    result.forEach(({ id, episodes }) => {
-      const latestEpisodes = episodes.map((episode) => {
-        return episode as SpotifyShowEpisode
-      })
-      releaseMap[id] = {
-        ...selectedPodcasts.value[id],
-        latest_episodes: latestEpisodes,
-      }
-    })
-    // console.log('Release dates:', releaseMap)
-    selectedPodcasts.value = releaseMap
+    const newId = Object.keys(updatedSelectedPodcasts).filter(
+      (k) => !Object.keys(selectedPodcasts.value).includes(k),
+    )[0]
+
+    const result: SpotifyShowEpisode[] = await getLatestEpisodes(newId, 5)
+    updatedSelectedPodcasts[newId] = {
+      ...updatedSelectedPodcasts[newId],
+      latest_episodes: result,
+    }
+    selectedPodcasts.value = updatedSelectedPodcasts
+    showToast.value = true
+    toastLevel.value = 'success'
+    toastMessage.value = 'View episodes in calendar below!'
   } catch (error) {
     console.error('Could not make API request:', error)
   }
@@ -68,9 +71,11 @@ onMounted(() => {
       searchBarRef.value?.unfocusInput()
     } else if (e.key === 'ArrowUp') {
       e.preventDefault()
+      searchBarRef.value?.unfocusInput()
       podcastListRef.value?.scrollHoverUp()
     } else if (e.key === 'ArrowDown') {
       e.preventDefault()
+      searchBarRef.value?.unfocusInput()
       podcastListRef.value?.scrollHoverDown()
     }
   })
@@ -82,7 +87,7 @@ onMounted(() => {
     Start by searching for podcasts from Spotify. Then, select up to 5 podcasts to view their latest
     release date in the calendar below.
   </p>
-  <v-snackbar v-model="showErrorToast" color="error" timeout="3000" location="top">
+  <v-snackbar v-model="showToast" :color="toastLevel" timeout="3000" location="bottom">
     {{ toastMessage }}
   </v-snackbar>
   <SearchBar :onClickSearch="fetchSpotifyPodcasts" ref="searchBarRef" />
